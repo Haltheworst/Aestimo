@@ -74,7 +74,8 @@ def bill():
 def stats():
     total = request.args.get('bill')
     return render_template('moni.html', price=total)
-
+    print(total)
+    
 if __name__ == '__main__':
     app.run(debug=True)
 
