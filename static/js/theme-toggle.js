@@ -1,0 +1,76 @@
+class ThemeManager {
+    constructor() {
+        this.currentTheme = localStorage.getItem('theme') || 'light';
+        this.init();
+    }
+    
+    init() {
+        this.createToggleButton();
+        this.applyTheme(this.currentTheme);
+        this.setupEventListeners();
+    }
+    
+    createToggleButton() {
+        const toggleContainer = document.createElement('div');
+        toggleContainer.className = 'theme-toggle-container';
+        
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'theme-toggle-btn';
+        toggleButton.innerHTML = `
+            <div class="toggle-track">
+                <div class="toggle-thumb">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </div>
+            </div>
+        `;
+        
+        toggleContainer.appendChild(toggleButton);
+        
+        const navbar = document.querySelector('.navbar .nav-container');
+        if (navbar) {
+            navbar.appendChild(toggleContainer);
+        }
+        
+        this.toggleButton = toggleButton;
+    }
+    
+    setupEventListeners() {
+        this.toggleButton.addEventListener('click', () => {
+            this.toggleTheme();
+        });
+    }
+    
+    toggleTheme() {
+        this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        this.applyTheme(this.currentTheme);
+        localStorage.setItem('theme', this.currentTheme);
+    }
+    
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        this.updateToggleButton(theme);
+    }
+    
+    updateToggleButton(theme) {
+        if (this.toggleButton) {
+            this.toggleButton.classList.toggle('dark', theme === 'dark');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new ThemeManager();
+});

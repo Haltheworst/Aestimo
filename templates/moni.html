@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="/static/css/stats.css">
 </head>
 <body>
+    <body>
+    <!-- Toast Container (add this) -->
+    <div id="toast-container"></div>
+    
+    <!-- Progress Bar -->
+    <div id="upload-progress" class="upload-progress hidden">
+        <!-- existing progress bar code -->
+    </div>
+    
+    <!-- Rest of your existing content -->
+    <nav class="navbar">
+        <!-- ... -->
+    </nav>
+
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
@@ -23,6 +37,7 @@
     <main class="main-content">
         <div class="container">
             <h1 class="page-title">Expense Summary</h1>
+            
             
             <!-- Latest Bill Card -->
             <section class="card stats-card">
@@ -44,6 +59,7 @@
                 <p class="bill-description">Successfully scanned and added to your expenses</p>
             </section>
 
+            
             <!-- Total Spending Card -->
             <section class="card stats-card">
                 <div class="card-header">
@@ -193,8 +209,12 @@
             window.location.href = '/';
         });
         
+        
         // Load budget data when page loads
         loadBudgetData();
+        
     </script>
+    <script src="/static/js/theme-toggle.js"></script>
+    
 </body>
 </html>

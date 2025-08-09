@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <body>
+    <!-- Toast Container (add this) -->
+    <div id="toast-container"></div>
+    
+    <!-- Progress Bar -->
+    <div id="upload-progress" class="upload-progress hidden">
+        <!-- existing progress bar code -->
+    </div>
+    
+    <!-- Rest of your existing content -->
+    <nav class="navbar">
+        <!-- ... -->
+    </nav>
+
     <!-- Progress Bar -->
     <div id="upload-progress" class="upload-progress hidden">
         <div class="progress-container">
@@ -20,40 +34,48 @@
         </div>
     </div>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <a href="/">Aestimo</a>
-            </div>
-            <div class="nav-links">
-                <a href="/" class="nav-link active">Home</a>
-                <a href="/stats" class="nav-link">Statistics</a>
-            </div>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <a href="/">Aestimo</a>
         </div>
-    </nav>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/stats" class="nav-link">Statistics</a>
+            <a href="/info" class="nav-link">Info</a>
+        </div>
+    </div>
+</nav>
+
 
     <main class="main-content">
         <div class="container">
             <h1 class="page-title">Track Your Expenses</h1>
             
-            <!-- Receipt Upload Section -->
-            <section class="card">
-                <h2 class="section-title">Upload Receipt</h2>
-                <form method="post" action="/bill" enctype="multipart/form-data" class="upload-form" id="upload-form">
-                    <div class="file-input-wrapper">
-                        <input type="file" name="file" id="file" class="file-input" accept="image/*,.pdf" required>
-                        <label for="file" class="file-label">
-                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7,10 12,15 17,10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            <span class="file-text">Choose receipt file</span>
-                        </label>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="upload-btn">Scan Receipt</button>
-                </form>
-            </section>
+           <!-- Receipt Upload Section -->
+<section class="card">
+    <h2 class="section-title">Upload Receipt</h2>
+    <form method="post" action="/bill" enctype="multipart/form-data" class="upload-form" id="upload-form">
+        <div class="file-input-wrapper">
+            <input type="file" name="file" id="file" class="file-input" accept="image/*,.pdf" required>
+            <label for="file" class="file-label">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span class="file-text">Choose receipt file</span>
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary" id="upload-btn">
+            <span class="btn-text">Scan Receipt</span>
+            <div class="btn-loader hidden">
+                <div class="spinner"></div>
+            </div>
+        </button>
+    </form>
+</section>
+
 
             <!-- Monthly Budget Section -->
             <section class="card">
@@ -87,5 +109,13 @@
 
     <script src="/static/js/monthlyBS.js"></script>
     <script src="/static/js/upload-progress.js"></script>
+    <script src="/static/js/theme-toggle.js"></script>
+        <script src="/static/js/monthlyBS.js"></script>
+    <script src="/static/js/upload-progress.js"></script>
+    <script src="/static/js/theme-toggle.js"></script>
+    <script src="/static/js/filename-display.js"></script> <!-- ADD THIS LINE -->
+</body>
+
+
 </body>
 </html>
