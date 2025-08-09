@@ -11,7 +11,9 @@ import warnings
 import numpy as np
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for 
+
+app = Flask(__name__)
 
 load_dotenv()
 
@@ -141,9 +143,11 @@ def info():
 
 
 
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
 
 
 
