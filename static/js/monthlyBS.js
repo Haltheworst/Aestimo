@@ -20,6 +20,7 @@ async function saveTarget(){
   const r = await fetch('/api/targets', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({month:m, target:v})});
   if(!r.ok) return note('Save failed', true);
   const d = await r.json(); note(`Saved ${d.month}: ${d.target}`);
+  alert("Budget saved!")
 }
 
 async function clearTarget(){

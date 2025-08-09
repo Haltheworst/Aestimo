@@ -3,11 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Expense Stats - Aestimo</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/stats.css">
 </head>
 <body>
-    Cost of bill: {{price}}
-    <br>
-    Total spent: {{total}}
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/">Aestimo</a>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/stats" class="nav-link active">Statistics</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Expense Summary</h1>
+            
+            <!-- Latest Bill Card -->
+            <section class="card stats-card">
+                <div class="card-header">
+                    <h2 class="section-title">Latest Receipt</h2>
+                    <div class="success-badge">
+                        <svg class="success-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Processed
+                    </div>
+                </div>
+                
+                <div class="bill-amount">
+                    <span class="currency">₹</span>
+                    <span class="amount">{{ "%.2f"|format(price) }}</span>
+                </div>
+                
+                <p class="bill-description">Successfully scanned and added to your expenses</p>
+            </section>
+
+            <!-- Total Spending Card -->
+            <section class="card stats-card">
+                <div class="card-header">
+                    <h2 class="section-title">Total Monthly Spending</h2>
+                    <div id="budget-status" class="budget-indicator">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="total-amount" id="total-display">
+                    <span class="currency">₹</span>
+                    <span class="amount" id="total-value">{{ "%.2f"|format(total) }}</span>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-labels">
+                        <span class="progress-spent">Spent: ₹{{ "%.2f"|format(total) }}</span>
+                        <span class="progress-budget" id="budget-display">Budget: Loading...</span>
+                    </div>
+                </div>
+                
+                <div id="budget-warning" class="budget-warning hidden">
+                    <!-- Warning message will appear here -->
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="card action-card">
+                <h3 class="section-title">Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="/" class="btn btn-primary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Add Another Receipt
+                    </a>
+                    <button id="set-budget-btn" class="btn btn-secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        Update Budget
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Get current month in YYYY-MM format
+        const now = new Date();
+        const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+        const totalSpent = {{ total }};
+        
+        // Fetch current month's budget
+        async function loadBudgetData() {
+            try {
+                const response = await fetch(`/api/targets?month=${currentMonth}`);
+                const data = await response.json();
+                
+                const budgetAmount = data.target || 0;
+                const spentPercentage = budgetAmount > 0 ? (totalSpent / budgetAmount) * 100 : 0;
+                
+                updateBudgetDisplay(budgetAmount, spentPercentage);
+                
+            } catch (error) {
+                console.error('Error loading budget:', error);
+                document.getElementById('budget-display').textContent = 'Budget: Not Set';
+                document.getElementById('budget-status').innerHTML = 
+                    '<span class="status-badge status-neutral">No Budget Set</span>';
+            }
+        }
+        
+        function updateBudgetDisplay(budget, percentage) {
+            // Update budget display
+            document.getElementById('budget-display').textContent = `Budget: ₹${budget.toFixed(2)}`;
+            
+            // Update progress bar
+            const progressFill = document.getElementById('progress-fill');
+            const clampedPercentage = Math.min(percentage, 100);
+            progressFill.style.width = `${clampedPercentage}%`;
+            
+            // Update colors and status based on spending percentage
+            const totalDisplay = document.getElementById('total-display');
+            const budgetStatus = document.getElementById('budget-status');
+            const budgetWarning = document.getElementById('budget-warning');
+            
+            if (budget === 0) {
+                budgetStatus.innerHTML = '<span class="status-badge status-neutral">No Budget Set</span>';
+                progressFill.className = 'progress-fill neutral';
+                return;
+            }
+            
+            // Color coding based on spending percentage
+            if (percentage >= 100) {
+                totalDisplay.className = 'total-amount danger';
+                progressFill.className = 'progress-fill danger';
+                budgetStatus.innerHTML = '<span class="status-badge status-danger">Over Budget!</span>';
+                budgetWarning.innerHTML = `
+                    <div class="warning-content danger">
+                        <svg class="warning-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong>Budget Exceeded!</strong>
+                            <p>You've spent ₹${(totalSpent - budget).toFixed(2)} over your monthly budget.</p>
+                        </div>
+                    </div>
+                `;
+                budgetWarning.classList.remove('hidden');
+            } else if (percentage >= 90) {
+                totalDisplay.className = 'total-amount warning';
+                progressFill.className = 'progress-fill warning';
+                budgetStatus.innerHTML = '<span class="status-badge status-warning">Almost Over Budget</span>';
+                budgetWarning.innerHTML = `
+                    <div class="warning-content warning">
+                        <svg class="warning-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong>Warning: Close to Budget Limit</strong>
+                            <p>You have ₹${(budget - totalSpent).toFixed(2)} remaining in your budget (${(100 - percentage).toFixed(1)}% left).</p>
+                        </div>
+                    </div>
+                `;
+                budgetWarning.classList.remove('hidden');
+            } else if (percentage >= 75) {
+                totalDisplay.className = 'total-amount caution';
+                progressFill.className = 'progress-fill caution';
+                budgetStatus.innerHTML = '<span class="status-badge status-caution">On Track</span>';
+                budgetWarning.classList.add('hidden');
+            } else {
+                totalDisplay.className = 'total-amount safe';
+                progressFill.className = 'progress-fill safe';
+                budgetStatus.innerHTML = '<span class="status-badge status-safe">Within Budget</span>';
+                budgetWarning.classList.add('hidden');
+            }
+        }
+        
+        // Set budget button functionality
+        document.getElementById('set-budget-btn').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+        
+        // Load budget data when page loads
+        loadBudgetData();
+    </script>
 </body>
 </html>
